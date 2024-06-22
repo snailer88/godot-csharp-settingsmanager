@@ -5,10 +5,10 @@
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
     <RootNamespace>Snailer.GodotCSharp.SettingsManager</RootNamespace>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.1.0</Version>
-	<Authors>Snailer</Authors>
-	<Description>Helper classes to simplify multiple settings files in Godot C# projects.</Description>
+    <Authors>Snailer</Authors>
+    <Description>Helper classes to simplify managing multiple settings files in Godot C# projects.</Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
