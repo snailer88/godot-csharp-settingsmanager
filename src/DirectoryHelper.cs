@@ -8,11 +8,9 @@ public static class DirectoryHelper
     {
         get
         {
-            var codeBase = Assembly.GetExecutingAssembly().Location;
-            var uri = new UriBuilder(codeBase);
-            var path = Uri.UnescapeDataString(uri.Path);
+            var location = Assembly.GetExecutingAssembly().Location;
 
-            return Path.GetDirectoryName(path) ?? throw new InvalidOperationException("Failed to locate executing directory.");
+            return Path.GetDirectoryName(location) ?? throw new InvalidOperationException("Failed to locate executing directory.");
         }
     }
 }
