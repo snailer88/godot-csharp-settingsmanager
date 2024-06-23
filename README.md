@@ -89,3 +89,29 @@ To update the value of a setting in both the `ISettings` object and JSON file, s
 ```cs
 public void OnFullscreenToggled(bool toggled) => mgr.SetSetting(nameof(GameSettings.IsFullscreen), toggled);
 ```
+
+### Autosaving
+
+By default, autosaving is enabled. This means that when `SetSettings()` is called, the JSON file is automatically written to. You may wish to instead provide a "Cancel" and "Save" button in your settings menu, allowing users to discard any changes made to the settings. In this case, you should set the `autosave` parameter to _false_:
+
+```cs
+var mgr = new SettingsManager<GameSettings>(GameSettings.FILENAME, false);
+```
+
+With autosave disabled, you must handle the saving of modified settings, and reload saved settings from the JSON file in the case that the user cancels the changes. You can do so with the `Save()` and `Load()` methods, respectively:
+
+```cs
+public void OnSaveSettingsClicked() => mgr.Save();
+
+public void OnCancelSettingsClicked() => mgr.Load();
+```
+
+### Setting defaults
+
+Your settings menu may contain a "Defaults" button which removes any user changes and loads your default settings. You can use the `SetDefaults()` method to accomplish this:
+
+```cs
+public void OnDefaultsSettingsClicked() => mgr.SetDefaults();
+```
+
+If autosaving is enabled, the default settings are then written to the JSON file. Otherwise, you can use `Save()` or `Load()` to save the defaults, or return the settings to the previous user-specified settings.
