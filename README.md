@@ -3,7 +3,12 @@
 
 # Godot Settings Manager
 
-The `SettingsManager` can be used to read/write from local JSON settings files when developing [Godot C# projects](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
+The `SettingsManager` can be used to read/write from local JSON settings files when developing [Godot C# projects](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html). Multiple settings files can be managed by creating as many `SettingsManager` instances as needed, utilizing different paths and settings classes. For example, you can create a manager for audio and video settings:
+
+```cs
+var audioSettingsManager = new SettingsManager<AudioSettings>("audio.json");
+var videoSettingsManager = new SettingsManager<VideoSettings>("video.json");
+```
 
 ## Installation
 
