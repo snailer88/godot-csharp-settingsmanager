@@ -21,6 +21,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      working-directory: test
     - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
