@@ -1,3 +1,6 @@
+[![NuGet](https://img.shields.io/nuget/v/Snailer.GodotCSharp.SettingsManager)](https://www.nuget.org/packages/Snailer.GodotCSharp.SettingsManager#versions-body-tab)
+[![build](https://github.com/snailer88/godot-csharp-settingsmanager/actions/workflows/build.yml/badge.svg)](https://github.com/snailer88/godot-csharp-settingsmanager/actions/workflows/build.yml)
+
 # Godot Settings Manager
 
 The `SettingsManager` can be used to read/write from local JSON settings files when developing [Godot C# projects](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html).
