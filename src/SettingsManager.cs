@@ -2,7 +2,6 @@ namespace Snailer.GodotCSharp.SettingsManager;
 
 using System;
 using System.IO;
-using System.Reflection;
 using Newtonsoft.Json;
 
 /// <summary>
@@ -10,9 +9,9 @@ using Newtonsoft.Json;
 /// </summary>
 public class SettingsManager<T> where T : class, ISettings
 {
+  private T? _settings;
   private readonly bool _autosave;
   private readonly string _fileName;
-  private T? _settings;
 
   /// <summary>
   /// Instantiates a new manager for reading/writing to the provided <paramref name="fileName"/>.
@@ -59,23 +58,27 @@ public class SettingsManager<T> where T : class, ISettings
   /// </summary>
   /// <param name="settingName">The name of the setting to update.</param>
   /// <param name="value">The new value of the setting.</param>
-  public void SetSetting(string settingName, object value)
+  /// <returns><c>True</c> if the setting was successfully set.</returns>
+  public bool SetSetting(string settingName, object value)
   {
     ArgumentNullException.ThrowIfNull(_settings);
 
     // Set property on settings object
-    var settingsProp = _settings.GetType().GetProperty(settingName);
-    if (settingsProp is null)
+    var expandedPropName = string.Join('.', GetFullPropertyPath(typeof(T), settingName));
+    var didSet = SetProperty(expandedPropName, _settings, value);
+    if (!didSet)
     {
-      return;
+      return false;
     }
-    settingsProp.SetValue(_settings, value);
+
     _settings.HandleSettingChange(settingName, value);
 
     if (_autosave)
     {
       Save();
     }
+
+    return true;
   }
 
   /// <summary>
@@ -105,6 +108,61 @@ public class SettingsManager<T> where T : class, ISettings
   }
 
   /// <summary>
+  /// Sets a property value on the target object.
+  /// </summary>
+  /// <param name="compoundProperty">The full path of the property where nested classes are separated with periods, e.g.
+  /// "MyClass.NestedClass.PropName"</param>
+  /// <param name="target">The object to set the value of.</param>
+  /// <param name="value">The value to set on the property.</param>
+  /// <returns><c>True</c> if the property was successfully set.</returns>
+  private static bool SetProperty(string compoundProperty, object? target, object value)
+  {
+    var bits = compoundProperty.Split('.');
+    bits ??= new string[1] { compoundProperty };
+    for (var i = 0; i < bits.Length - 1; i++)
+    {
+      var propertyToGet = target?.GetType().GetProperty(bits[i]);
+      var propertyValue = propertyToGet?.GetValue(target, null);
+      if (propertyValue is null && propertyToGet is not null)
+      {
+        propertyValue = Activator.CreateInstance(propertyToGet.PropertyType);
+        propertyToGet.SetValue(target, propertyValue);
+      }
+
+      target = propertyToGet?.GetValue(target, null);
+    }
+
+    var propertyToSet = target?.GetType().GetProperty(bits.Last());
+    if (propertyToSet is not null)
+    {
+      propertyToSet.SetValue(target, value, null);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  /// <summary>
+  /// Returns the full path of a property within the given type, recursively to include properties which are classes.
+  /// </summary>
+  private static IEnumerable<string> GetFullPropertyPath(Type baseType, string propertyName)
+  {
+    var prop = baseType.GetProperty(propertyName);
+    if (prop != null)
+    {
+      return new[] { prop.Name };
+    }
+    else if (baseType.IsClass && baseType != typeof(string)) // Do not go into primitives (condition could be refined, this excludes all structs and strings)
+    {
+      return baseType
+          .GetProperties()
+          .SelectMany(p => GetFullPropertyPath(p.PropertyType, propertyName), (p, v) => p.Name + "." + v);
+    }
+    return Enumerable.Empty<string>();
+  }
+
+  /// <summary>
   /// Writes the provided <paramref name="settings"/> object to the JSON file.
   /// </summary>
   private void WriteSettings(T? settings) => File.WriteAllText(GetSettingsPath(), JsonConvert.SerializeObject(settings, Formatting.Indented));
@@ -113,7 +171,7 @@ public class SettingsManager<T> where T : class, ISettings
   /// Gets the absolute path to the settings JSON file.
   /// </summary>
   /// <returns></returns>
-  private string GetSettingsPath() => Path.Combine(Assembly.GetExecutingAssembly().Location, _fileName);
+  private string GetSettingsPath() => Path.Combine(DirectoryHelper.ExecutingAssemblyDirectory, _fileName);
 
   /// <summary>
   /// Reads the JSON file from the filesystem and returns the settings object.

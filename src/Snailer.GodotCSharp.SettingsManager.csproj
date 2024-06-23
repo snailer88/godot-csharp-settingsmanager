@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>Snailer.GodotCSharp.SettingsManager</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <Authors>Snailer</Authors>
     <Description>Helper classes to simplify managing multiple settings files in Godot C# projects.</Description>
   </PropertyGroup>

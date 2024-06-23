@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snailer.GodotCSharp.SettingsManager", "src\Snailer.GodotCSharp.SettingsManager.csproj", "{56650776-25AF-4742-B42A-46EF9BCDD4DF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snailer.Godot.SettingsManager.Tests", "tests\Snailer.Godot.SettingsManager.Tests.csproj", "{7CD6C709-93DE-4575-B446-5FEF2F3AAA0D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{56650776-25AF-4742-B42A-46EF9BCDD4DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56650776-25AF-4742-B42A-46EF9BCDD4DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56650776-25AF-4742-B42A-46EF9BCDD4DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56650776-25AF-4742-B42A-46EF9BCDD4DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CD6C709-93DE-4575-B446-5FEF2F3AAA0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CD6C709-93DE-4575-B446-5FEF2F3AAA0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CD6C709-93DE-4575-B446-5FEF2F3AAA0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CD6C709-93DE-4575-B446-5FEF2F3AAA0D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A023219B-86A1-4163-9580-2360C7DC88CC}
+	EndGlobalSection
+EndGlobal
