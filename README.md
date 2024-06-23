@@ -3,7 +3,7 @@
 
 # Godot Settings Manager
 
-The `SettingsManager` can be used to read/write from local JSON settings files when developing [Godot C# projects](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html). Multiple settings files can be managed by creating as many `SettingsManager` instances as needed, utilizing different paths and settings classes. For example, you can create a manager for audio and video settings:
+The `SettingsManager` can be used to read/write local JSON settings files when developing [Godot C# projects](https://docs.godotengine.org/en/stable/tutorials/scripting/c_sharp/c_sharp_basics.html). Multiple settings files can be managed by creating as many `SettingsManager` instances as needed, utilizing different paths and settings classes. For example, you can create a manager for audio and video settings:
 
 ```cs
 var audioSettingsManager = new SettingsManager<AudioSettings>("audio.json");
@@ -22,7 +22,6 @@ dotnet add package Snailer.GodotCSharp.SettingsManager
 
 Your game's settings will be represented by a class you create which implements `ISetting`. The class should contain properties which correspond with the settings you wish to manage in your project. In this example, the settings file contains a single "IsFullscreen" setting with a default value:
 
---__GameSettings.cs__--
 ```cs
 public class GameSettings : ISettings
 {
@@ -32,7 +31,7 @@ public class GameSettings : ISettings
 }
 ```
 
---__Generated .json file__--
+Resulting .json file:
 ```json
 {
   "IsFullscreen": true
