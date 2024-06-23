@@ -10,6 +10,27 @@ var audioSettingsManager = new SettingsManager<AudioSettings>("audio.json");
 var videoSettingsManager = new SettingsManager<VideoSettings>("video.json");
 ```
 
+You can also opt to contain all settings within a single settings file. Using nested classes, you can still organize categories of settings:
+
+```cs
+public class GameSettings : ISettings
+{
+    public Audio Audio { get; set; } = new();
+
+    public Video Video { get; set; } = new();
+}
+
+public class Audio
+{
+    public double MusicVolume { get; set; } = 0.5;
+}
+
+public class Video
+{
+    public bool IsFullscreen { get; set; } = true;
+}
+```
+
 ## Installation
 
 Add the NuGet package to your Godot project:
