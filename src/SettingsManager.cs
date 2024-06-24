@@ -171,7 +171,7 @@ public class SettingsManager<T> where T : class, ISettings
   /// Gets the absolute path to the settings JSON file.
   /// </summary>
   /// <returns></returns>
-  private string GetSettingsPath() => Path.Combine(DirectoryHelper.ExecutingAssemblyDirectory, _fileName);
+  private string GetSettingsPath() => DirectoryHelper.GetPathToFile(_fileName);
 
   /// <summary>
   /// Reads the JSON file from the filesystem and returns the settings object.
