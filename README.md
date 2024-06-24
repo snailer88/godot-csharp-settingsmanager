@@ -117,10 +117,10 @@ public void OnFullscreenToggled(bool toggled) => mgr.SetSetting(nameof(GameSetti
 
 ### Autosaving
 
-By default, autosaving is enabled. This means that when `SetSettings()` is called, the JSON file is automatically written to. You may wish to instead provide a "Cancel" and "Save" button in your settings menu, allowing users to discard any changes made to the settings. In this case, you should set the `autosave` parameter to _false_:
+By default, autosaving is enabled. This means that when `SetSetting()` is called, the JSON file is automatically written to. You may wish to instead provide a "Cancel" and "Save" button in your settings menu, allowing users to discard any changes made to the settings.
 
 ```cs
-var mgr = new SettingsManager<GameSettings>(GameSettings.FILENAME, false);
+var mgr = new SettingsManager<GameSettings>(GameSettings.FILENAME, new() { AutoSaveChanges = false });
 ```
 
 With autosave disabled, you must handle the saving of modified settings, and reload saved settings from the JSON file in the case that the user cancels the changes. You can do so with the `Save()` and `Load()` methods, respectively:
@@ -130,6 +130,16 @@ public void OnSaveSettingsClicked() => mgr.Save();
 
 public void OnCancelSettingsClicked() => mgr.Load();
 ```
+
+### Auto-handing changes
+
+By default, when a setting is modified via `SetSetting()`, the `ISetting.HandleSettingChange()` method is called allowing you to react to the settings change and apply it to the program. You could disable this behavior, for example if your "Settings" scene has an "Apply" button.
+
+```cs
+var mgr = new SettingsManager<GameSettings>(GameSettings.FILENAME, new() { AutoHandleChanges = false });
+```
+
+When disabled, you can manually call `ISettings.HandleSettingChange` to initialize a single setting, or `ISettings.InitializeSettings` to initialize all settings.
 
 ### Setting defaults
 
