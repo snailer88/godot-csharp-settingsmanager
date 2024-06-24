@@ -139,7 +139,8 @@ public class SettingsManager<T> where T : class, ISettings
     {
       return new[] { prop.Name };
     }
-    else if (baseType.IsClass && baseType != typeof(string)) // Do not go into primitives (condition could be refined, this excludes all structs and strings)
+    else if (baseType.IsClass && baseType != typeof(string))
+    // Do not go into primitives (condition could be refined, this excludes all structs and strings)
     {
       return baseType
           .GetProperties()
@@ -161,7 +162,8 @@ public class ManagerSettings
 
   /// <summary>
   /// If <c>false</c>, <see cref="ISettings.HandleSettingChange"/> is not called when settings are changed.
-  /// <see cref="ISettings.InitializeSettings"/> can be called manually to initialize modified settings.
+  /// <see cref="ISettings.HandleSettingChange"/> or <see cref="ISettings.InitializeSettings"/> can be called manually to initialize
+  /// modified settings.
   /// </summary>
   public bool AutoHandleChanges { get; set; } = true;
 }

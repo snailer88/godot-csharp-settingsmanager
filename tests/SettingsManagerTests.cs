@@ -163,4 +163,19 @@ public class SettingsManagerTests
             Assert.That(settingsAfterLoad.StringProperty, Is.EqualTo(defaultStringValue));
         });
     }
+
+    [Test]
+    public void AutoHandleChangesOff_DoesntCallHandler()
+    {
+        // Arrange
+        var mgr = new SettingsManager<SettingsSetsNullOnHandle>(SETTINGS_NAME, new() { AutoHandleChanges = false });
+        var expectedStringPropertyValue = "a";
+
+        // Act
+        mgr.SetSetting(nameof(SettingsSetsNullOnHandle.StringProperty), expectedStringPropertyValue);
+        var settings = mgr.GetSettings();
+
+        // Assert
+        Assert.That(settings.StringProperty, Is.EqualTo(expectedStringPropertyValue));
+    }
 }
