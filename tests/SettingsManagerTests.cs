@@ -76,7 +76,7 @@ public class SettingsManagerTests
     public void AutosaveOff_Load_ResetsValues()
     {
         // Arrange
-        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, false);
+        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, new() { AutoSaveChanges = false });
         var settings = mgr.GetSettings();
         var defaultStringValue = settings.StringProperty;
         var defaultIntValue = settings.IntProperty;
@@ -102,7 +102,7 @@ public class SettingsManagerTests
     public void AutosaveOff_Save_CommitsValues()
     {
         // Arrange
-        var mgr = new SettingsManager<SettingsWithSimpleTypes>(SETTINGS_NAME, false);
+        var mgr = new SettingsManager<SettingsWithSimpleTypes>(SETTINGS_NAME, new() { AutoSaveChanges = false });
         var expectedStringValue = "test";
 
         // Act
@@ -142,7 +142,7 @@ public class SettingsManagerTests
     public void AutosaveOff_SetDefaults_ResetsValuesDoesntCommit()
     {
         // Arrange
-        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, false);
+        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, new() { AutoSaveChanges = false });
         var settings = mgr.GetSettings();
         var defaultStringValue = settings.StringProperty;
         var modifiedStringValue = defaultStringValue + "test";

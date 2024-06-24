@@ -8,18 +8,17 @@ using System;
 public class SettingsManager<T> where T : class, ISettings
 {
   private T? _settings;
-  private readonly bool _autosave;
   private readonly string _fileName;
+  private readonly ManagerSettings _managerSettings;
 
   /// <summary>
   /// Instantiates a new manager for reading/writing to the provided <paramref name="fileName"/>.
   /// </summary>
-  /// <param name="fileName">The name of the JSON file settings are stored in.</param>
-  /// <param name="autosave">If <c>false</c>, the JSON file is only written to when <see cref="Save"/> is called.</param>
-  public SettingsManager(string fileName, bool autosave = true)
+  /// <param name="managerSettings">Optional configuration for the manager.</param>
+  public SettingsManager(string fileName, ManagerSettings? managerSettings = null)
   {
     _fileName = fileName;
-    _autosave = autosave;
+    _managerSettings = managerSettings ?? new();
     JsonFileHelper.EnsureJsonFile<T>(_fileName);
     Load();
   }
@@ -68,9 +67,12 @@ public class SettingsManager<T> where T : class, ISettings
       return false;
     }
 
-    _settings.HandleSettingChange(settingName, value);
+    if (_managerSettings.AutoHandleChanges)
+    {
+      _settings.HandleSettingChange(settingName, value);
+    }
 
-    if (_autosave)
+    if (_managerSettings.AutoSaveChanges)
     {
       Save();
     }
@@ -85,7 +87,7 @@ public class SettingsManager<T> where T : class, ISettings
   {
     _settings = Activator.CreateInstance<T>();
     _settings.InitializeSettings();
-    if (_autosave)
+    if (_managerSettings.AutoSaveChanges)
     {
       Save();
     }
@@ -145,4 +147,21 @@ public class SettingsManager<T> where T : class, ISettings
     }
     return Enumerable.Empty<string>();
   }
+}
+
+/// <summary>
+/// Configures <see cref="SettingsManager{T}"/> behavior.
+/// </summary>
+public class ManagerSettings
+{
+  /// <summary>
+  /// If <c>false</c>, the JSON file is only written to when <see cref="SettingsManager{T}.Save"/> is called.
+  /// </summary>
+  public bool AutoSaveChanges { get; set; } = true;
+
+  /// <summary>
+  /// If <c>false</c>, <see cref="ISettings.HandleSettingChange"/> is not called when settings are changed.
+  /// <see cref="ISettings.InitializeSettings"/> can be called manually to initialize modified settings.
+  /// </summary>
+  public bool AutoHandleChanges { get; set; } = true;
 }
