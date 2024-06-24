@@ -117,7 +117,7 @@ public void OnFullscreenToggled(bool toggled) => mgr.SetSetting(nameof(GameSetti
 
 ### Autosaving
 
-By default, autosaving is enabled. This means that when `SetSettings()` is called, the JSON file is automatically written to. You may wish to instead provide a "Cancel" and "Save" button in your settings menu, allowing users to discard any changes made to the settings.
+By default, autosaving is enabled. This means that when `SetSetting()` is called, the JSON file is automatically written to. You may wish to instead provide a "Cancel" and "Save" button in your settings menu, allowing users to discard any changes made to the settings.
 
 ```cs
 var mgr = new SettingsManager<GameSettings>(GameSettings.FILENAME, new() { AutoSaveChanges = false });
