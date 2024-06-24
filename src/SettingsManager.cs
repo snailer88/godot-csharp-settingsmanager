@@ -1,8 +1,6 @@
 namespace Snailer.GodotCSharp.SettingsManager;
 
 using System;
-using System.IO;
-using Newtonsoft.Json;
 
 /// <summary>
 /// Contains methods for loading and saving settings files.
@@ -22,7 +20,7 @@ public class SettingsManager<T> where T : class, ISettings
   {
     _fileName = fileName;
     _autosave = autosave;
-    Ensure();
+    JsonFileHelper.EnsureJsonFile<T>(_fileName);
     Load();
   }
 
@@ -36,7 +34,7 @@ public class SettingsManager<T> where T : class, ISettings
       return _settings;
     }
 
-    return ReadSettings();
+    return JsonFileHelper.ReadJsonFile<T>(_fileName);
   }
 
   /// <summary>
@@ -44,21 +42,20 @@ public class SettingsManager<T> where T : class, ISettings
   /// </summary>
   public void Load()
   {
-    _settings = ReadSettings();
+    _settings = JsonFileHelper.ReadJsonFile<T>(_fileName);
     _settings.InitializeSettings();
   }
 
   /// <summary>
   /// Writes the in-memory settings object to the JSON file.
   /// </summary>
-  public void Save() => WriteSettings(_settings);
+  public void Save() => JsonFileHelper.WriteJsonFile(_settings, _fileName);
 
   /// <summary>
   /// Sets the value of an in-memory setting. If autosave is enabled, the JSON file is also updated.
   /// </summary>
   /// <param name="settingName">The name of the setting to update.</param>
   /// <param name="value">The new value of the setting.</param>
-  /// <returns><c>True</c> if the setting was successfully set.</returns>
   public bool SetSetting(string settingName, object value)
   {
     ArgumentNullException.ThrowIfNull(_settings);
@@ -92,19 +89,6 @@ public class SettingsManager<T> where T : class, ISettings
     {
       Save();
     }
-  }
-
-  /// <summary>
-  /// Ensures that the settings JSON file exists. If not, it is created with the default settings.
-  /// </summary>
-  private void Ensure()
-  {
-    if (File.Exists(GetSettingsPath()))
-    {
-      return;
-    }
-
-    WriteSettings(Activator.CreateInstance<T>());
   }
 
   /// <summary>
@@ -160,35 +144,5 @@ public class SettingsManager<T> where T : class, ISettings
           .SelectMany(p => GetFullPropertyPath(p.PropertyType, propertyName), (p, v) => p.Name + "." + v);
     }
     return Enumerable.Empty<string>();
-  }
-
-  /// <summary>
-  /// Writes the provided <paramref name="settings"/> object to the JSON file.
-  /// </summary>
-  private void WriteSettings(T? settings) => File.WriteAllText(GetSettingsPath(), JsonConvert.SerializeObject(settings, Formatting.Indented));
-
-  /// <summary>
-  /// Gets the absolute path to the settings JSON file.
-  /// </summary>
-  /// <returns></returns>
-  private string GetSettingsPath() => DirectoryHelper.GetPathToFile(_fileName);
-
-  /// <summary>
-  /// Reads the JSON file from the filesystem and returns the settings object.
-  /// </summary>
-  /// <exception cref="FileNotFoundException"></exception>
-  /// <exception cref="JsonReaderException"></exception>
-  private T ReadSettings()
-  {
-    var path = GetSettingsPath();
-    if (!File.Exists(path))
-    {
-      throw new FileNotFoundException($"The settings file '{path}' was not found.");
-    }
-
-    var text = File.ReadAllText(path);
-
-    return JsonConvert.DeserializeObject<T>(text)
-      ?? throw new JsonReaderException($"The settings file '{path}' cannot be deserialized.");
   }
 }

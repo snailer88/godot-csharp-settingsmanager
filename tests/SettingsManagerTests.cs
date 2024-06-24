@@ -12,7 +12,7 @@ public class SettingsManagerTests
     public void TearDown()
     {
         // Delete generated .json file
-        var path = DirectoryHelper.GetPathToFile(SETTINGS_NAME);
+        var path = JsonFileHelper.GetPathToFile(SETTINGS_NAME);
         if (File.Exists(path))
         {
             File.Delete(path);
