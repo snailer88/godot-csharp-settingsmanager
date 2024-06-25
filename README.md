@@ -39,6 +39,14 @@ During your program's startup, create a new `SettingsManager` which will be resp
 GlobalObjects.MySettingsManager = new SettingsManager<MyGameSettings>(MyGameSettings.FILENAME);
 ```
 
+### Auto-handing changes
+
+By default, when a setting is modified via `SetSetting()`, the `ISetting.HandleSettingChange()` method is called allowing you to react to the settings change and apply it to the program. You could disable this behavior, for example if your "Settings" scene has an "Apply" button.
+
+```cs
+var mgr = new SettingsManager<GameSettings>(GameSettings.FILENAME, new() { AutoHandleChanges = false });
+```
+
 ## Documentation
 
 Check out the documentation for detailed usage scenarios and examples!

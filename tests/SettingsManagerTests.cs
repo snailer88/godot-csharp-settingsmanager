@@ -12,7 +12,7 @@ public class SettingsManagerTests
     public void TearDown()
     {
         // Delete generated .json file
-        var path = DirectoryHelper.GetPathToFile(SETTINGS_NAME);
+        var path = JsonFileHelper.GetPathToFile(SETTINGS_NAME);
         if (File.Exists(path))
         {
             File.Delete(path);
@@ -76,7 +76,7 @@ public class SettingsManagerTests
     public void AutosaveOff_Load_ResetsValues()
     {
         // Arrange
-        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, false);
+        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, new() { AutoSaveChanges = false });
         var settings = mgr.GetSettings();
         var defaultStringValue = settings.StringProperty;
         var defaultIntValue = settings.IntProperty;
@@ -102,7 +102,7 @@ public class SettingsManagerTests
     public void AutosaveOff_Save_CommitsValues()
     {
         // Arrange
-        var mgr = new SettingsManager<SettingsWithSimpleTypes>(SETTINGS_NAME, false);
+        var mgr = new SettingsManager<SettingsWithSimpleTypes>(SETTINGS_NAME, new() { AutoSaveChanges = false });
         var expectedStringValue = "test";
 
         // Act
@@ -142,7 +142,7 @@ public class SettingsManagerTests
     public void AutosaveOff_SetDefaults_ResetsValuesDoesntCommit()
     {
         // Arrange
-        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, false);
+        var mgr = new SettingsManager<SettingsWithDefaultValues>(SETTINGS_NAME, new() { AutoSaveChanges = false });
         var settings = mgr.GetSettings();
         var defaultStringValue = settings.StringProperty;
         var modifiedStringValue = defaultStringValue + "test";
@@ -162,5 +162,20 @@ public class SettingsManagerTests
             Assert.That(settingsAfterReset.StringProperty, Is.EqualTo(defaultStringValue));
             Assert.That(settingsAfterLoad.StringProperty, Is.EqualTo(defaultStringValue));
         });
+    }
+
+    [Test]
+    public void AutoHandleChangesOff_DoesntCallHandler()
+    {
+        // Arrange
+        var mgr = new SettingsManager<SettingsSetsNullOnHandle>(SETTINGS_NAME, new() { AutoHandleChanges = false });
+        var expectedStringPropertyValue = "a";
+
+        // Act
+        mgr.SetSetting(nameof(SettingsSetsNullOnHandle.StringProperty), expectedStringPropertyValue);
+        var settings = mgr.GetSettings();
+
+        // Assert
+        Assert.That(settings.StringProperty, Is.EqualTo(expectedStringPropertyValue));
     }
 }

@@ -1,8 +1,6 @@
 namespace Snailer.GodotCSharp.SettingsManager;
 
 using System;
-using System.IO;
-using Newtonsoft.Json;
 
 /// <summary>
 /// Contains methods for loading and saving settings files.
@@ -10,19 +8,18 @@ using Newtonsoft.Json;
 public class SettingsManager<T> where T : class, ISettings
 {
   private T? _settings;
-  private readonly bool _autosave;
   private readonly string _fileName;
+  private readonly ManagerSettings _managerSettings;
 
   /// <summary>
   /// Instantiates a new manager for reading/writing to the provided <paramref name="fileName"/>.
   /// </summary>
-  /// <param name="fileName">The name of the JSON file settings are stored in.</param>
-  /// <param name="autosave">If <c>false</c>, the JSON file is only written to when <see cref="Save"/> is called.</param>
-  public SettingsManager(string fileName, bool autosave = true)
+  /// <param name="managerSettings">Optional configuration for the manager.</param>
+  public SettingsManager(string fileName, ManagerSettings? managerSettings = null)
   {
     _fileName = fileName;
-    _autosave = autosave;
-    Ensure();
+    _managerSettings = managerSettings ?? new();
+    JsonFileHelper.EnsureJsonFile<T>(_fileName);
     Load();
   }
 
@@ -36,7 +33,7 @@ public class SettingsManager<T> where T : class, ISettings
       return _settings;
     }
 
-    return ReadSettings();
+    return JsonFileHelper.ReadJsonFile<T>(_fileName);
   }
 
   /// <summary>
@@ -44,21 +41,20 @@ public class SettingsManager<T> where T : class, ISettings
   /// </summary>
   public void Load()
   {
-    _settings = ReadSettings();
+    _settings = JsonFileHelper.ReadJsonFile<T>(_fileName);
     _settings.InitializeSettings();
   }
 
   /// <summary>
   /// Writes the in-memory settings object to the JSON file.
   /// </summary>
-  public void Save() => WriteSettings(_settings);
+  public void Save() => JsonFileHelper.WriteJsonFile(_settings, _fileName);
 
   /// <summary>
   /// Sets the value of an in-memory setting. If autosave is enabled, the JSON file is also updated.
   /// </summary>
   /// <param name="settingName">The name of the setting to update.</param>
   /// <param name="value">The new value of the setting.</param>
-  /// <returns><c>True</c> if the setting was successfully set.</returns>
   public bool SetSetting(string settingName, object value)
   {
     ArgumentNullException.ThrowIfNull(_settings);
@@ -71,9 +67,12 @@ public class SettingsManager<T> where T : class, ISettings
       return false;
     }
 
-    _settings.HandleSettingChange(settingName, value);
+    if (_managerSettings.AutoHandleChanges)
+    {
+      _settings.HandleSettingChange(settingName, value);
+    }
 
-    if (_autosave)
+    if (_managerSettings.AutoSaveChanges)
     {
       Save();
     }
@@ -88,23 +87,10 @@ public class SettingsManager<T> where T : class, ISettings
   {
     _settings = Activator.CreateInstance<T>();
     _settings.InitializeSettings();
-    if (_autosave)
+    if (_managerSettings.AutoSaveChanges)
     {
       Save();
     }
-  }
-
-  /// <summary>
-  /// Ensures that the settings JSON file exists. If not, it is created with the default settings.
-  /// </summary>
-  private void Ensure()
-  {
-    if (File.Exists(GetSettingsPath()))
-    {
-      return;
-    }
-
-    WriteSettings(Activator.CreateInstance<T>());
   }
 
   /// <summary>
@@ -153,7 +139,8 @@ public class SettingsManager<T> where T : class, ISettings
     {
       return new[] { prop.Name };
     }
-    else if (baseType.IsClass && baseType != typeof(string)) // Do not go into primitives (condition could be refined, this excludes all structs and strings)
+    else if (baseType.IsClass && baseType != typeof(string))
+    // Do not go into primitives (condition could be refined, this excludes all structs and strings)
     {
       return baseType
           .GetProperties()
@@ -161,34 +148,22 @@ public class SettingsManager<T> where T : class, ISettings
     }
     return Enumerable.Empty<string>();
   }
+}
+
+/// <summary>
+/// Configures <see cref="SettingsManager{T}"/> behavior.
+/// </summary>
+public class ManagerSettings
+{
+  /// <summary>
+  /// If <c>false</c>, the JSON file is only written to when <see cref="SettingsManager{T}.Save"/> is called.
+  /// </summary>
+  public bool AutoSaveChanges { get; set; } = true;
 
   /// <summary>
-  /// Writes the provided <paramref name="settings"/> object to the JSON file.
+  /// If <c>false</c>, <see cref="ISettings.HandleSettingChange"/> is not called when settings are changed.
+  /// <see cref="ISettings.HandleSettingChange"/> or <see cref="ISettings.InitializeSettings"/> can be called manually to initialize
+  /// modified settings.
   /// </summary>
-  private void WriteSettings(T? settings) => File.WriteAllText(GetSettingsPath(), JsonConvert.SerializeObject(settings, Formatting.Indented));
-
-  /// <summary>
-  /// Gets the absolute path to the settings JSON file.
-  /// </summary>
-  /// <returns></returns>
-  private string GetSettingsPath() => DirectoryHelper.GetPathToFile(_fileName);
-
-  /// <summary>
-  /// Reads the JSON file from the filesystem and returns the settings object.
-  /// </summary>
-  /// <exception cref="FileNotFoundException"></exception>
-  /// <exception cref="JsonReaderException"></exception>
-  private T ReadSettings()
-  {
-    var path = GetSettingsPath();
-    if (!File.Exists(path))
-    {
-      throw new FileNotFoundException($"The settings file '{path}' was not found.");
-    }
-
-    var text = File.ReadAllText(path);
-
-    return JsonConvert.DeserializeObject<T>(text)
-      ?? throw new JsonReaderException($"The settings file '{path}' cannot be deserialized.");
-  }
+  public bool AutoHandleChanges { get; set; } = true;
 }
