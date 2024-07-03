@@ -45,3 +45,7 @@ Check out the documentation for detailed usage scenarios and examples!
 
 - [Creating a settings class](/docs/CreatingSettings.md)
 - [Managing settings](/docs/ManagingSettings.md)
+
+## Other projects
+
+Wanna easily manage your scenes? Check out my [SceneManager](https://github.com/snailer88/godot-csharp-scenemanager)!
